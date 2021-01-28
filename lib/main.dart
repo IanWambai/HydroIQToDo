@@ -46,10 +46,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<ListItem> items = List<ListItem>.generate(
-    30,
-    (i) => i % 6 == 0 ? HeadingItem("Heading $i") : MessageItem("Task $i"),
-  );
+  TextEditingController todoItemController = TextEditingController();
+
+  final List<ListItem> todoList = new List();
 
   _displayDialog() {
     return showDialog(
@@ -57,13 +56,107 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (BuildContext context) {
           return Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
+              borderRadius: BorderRadius.circular(36),
             ),
             elevation: 6,
             backgroundColor: Colors.transparent,
-            child: _dialogWithTextField(context),
+            child: Container(
+              height: 250,
+              decoration: BoxDecoration(
+                color: Color(0xff222228),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              child: Column(
+                children: <Widget>[
+                  SizedBox(height: 24),
+                  Text(
+                    "New Task",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: TextFormField(
+                        controller: todoItemController,
+                        style: TextStyle(color: Colors.white, fontSize: 20.0),
+                        maxLines: 1,
+                        autofocus: false,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.only(
+                              top: 24.0, bottom: 16.0, left: 16.0, right: 16.0),
+                          labelStyle:
+                              TextStyle(color: Colors.grey, fontSize: 18.0),
+                          labelText: 'Add your task here',
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.grey, width: 1.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.grey, width: 1.0),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        // The validator receives the text that the user has entered.
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Add your task here';
+                          }
+                          return null;
+                        },
+                      )),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      RaisedButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32.0),
+                        ),
+                        color: Color(0xff3E6AD5),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 16.0, bottom: 14.0, left: 8.0, right: 8.0),
+                          child: Text(
+                            "Save Task",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          //Add data to list
+                          _addTodoItem();
+                          todoItemController.clear();
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
           );
         });
+  }
+
+  // This will be called each time the + button is pressed
+  void _addTodoItem() {
+    // Putting our code inside "setState" tells the app that our state has changed, and
+    // it will automatically re-render the list
+    setState(() {
+      todoList.add(TodoItem(todoItemController.text));
+    });
   }
 
   @override
@@ -118,11 +211,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.all(16.0),
                   child: ListView.builder(
                     // Let the ListView know how many items it needs to build.
-                    itemCount: items.length,
+                    itemCount: todoList.length,
                     // Provide a builder function. This is where the magic happens.
                     // Convert each item into a widget based on the type of item it is.
                     itemBuilder: (context, index) {
-                      final item = items[index];
+                      final item = todoList[index];
 
                       return ListTile(
                         title: item.buildTask(context),
@@ -175,10 +268,10 @@ class HeadingItem implements ListItem {
 }
 
 /// A ListItem that contains data to display a message.
-class MessageItem implements ListItem {
+class TodoItem implements ListItem {
   final String task;
 
-  MessageItem(this.task);
+  TodoItem(this.task);
 
   Widget buildTask(BuildContext context) => Container(
         decoration: BoxDecoration(
@@ -193,77 +286,3 @@ class MessageItem implements ListItem {
         ),
       );
 }
-
-Widget _dialogWithTextField(BuildContext context) => Container(
-      height: 250,
-      decoration: BoxDecoration(
-        color: Color(0xff222228),
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.all(Radius.circular(12)),
-      ),
-      child: Column(
-        children: <Widget>[
-          SizedBox(height: 24),
-          Text(
-            "New Task",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-              padding: EdgeInsets.all(16.0),
-              child: TextFormField(
-                style: TextStyle(color: Colors.white, fontSize: 20.0),
-                maxLines: 1,
-                autofocus: false,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.only(
-                      top: 32.0, bottom: 16.0, left: 16.0, right: 16.0),
-                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18.0),
-                  labelText: 'Add your task here',
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
-                ),
-              )),
-          SizedBox(height: 16),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              RaisedButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32.0),
-                ),
-                color: Color(0xff3E6AD5),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 16.0, bottom: 14.0, left: 8.0, right: 8.0),
-                  child: Text(
-                    "Save Task",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                ),
-                onPressed: () {
-                  //Add data to list
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          ),
-        ],
-      ),
-    );
