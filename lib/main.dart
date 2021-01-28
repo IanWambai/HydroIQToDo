@@ -122,13 +122,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      floatingActionButton: Align(
-        alignment: Alignment.bottomCenter,
-        child: FloatingActionButton(
-          onPressed: _incrementCounter,
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
-        ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -152,7 +150,10 @@ class HeadingItem implements ListItem {
   Widget buildTitle(BuildContext context) {
     return Text(
       heading,
-      style: Theme.of(context).textTheme.headline5,
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 30.0,
+      ),
     );
   }
 
@@ -166,7 +167,13 @@ class MessageItem implements ListItem {
 
   MessageItem(this.sender, this.body);
 
-  Widget buildTitle(BuildContext context) => Text(sender);
+  Widget buildTitle(BuildContext context) => Text(
+        sender,
+        style: TextStyle(color: Colors.white),
+      );
 
-  Widget buildSubtitle(BuildContext context) => Text(body);
+  Widget buildSubtitle(BuildContext context) => Text(
+        body,
+        style: TextStyle(color: Colors.white),
+      );
 }
