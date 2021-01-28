@@ -25,13 +25,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'HydroIQ ToDo',
       theme: ThemeData(
         fontFamily: 'JosefinSans',
         primarySwatch: primarySwatch,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'HydroIQ ToDo'),
     );
   }
 }
@@ -48,7 +48,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController todoItemController = TextEditingController();
 
-  final List<ListItem> todoList = new List();
+  final List<ListItem> todoTaskList = new List();
+  final List<ListItem> completedTaskList = new List();
+  int _index = 0;
 
   _displayDialog() {
     return showDialog(
@@ -155,8 +157,38 @@ class _MyHomePageState extends State<MyHomePage> {
     // Putting our code inside "setState" tells the app that our state has changed, and
     // it will automatically re-render the list
     setState(() {
-      todoList.add(TodoItem(todoItemController.text));
+      todoTaskList.add(TodoItem(todoItemController.text));
     });
+  }
+
+  // Much like _addTodoItem, this modifies the array of todo strings and
+// notifies the app that the state has changed by using setState
+  void _removeTodoItem(int index) {
+    setState(() {
+      completedTaskList.add(todoTaskList[index]);
+      todoTaskList.removeAt(index);
+    });
+  }
+
+  // Show an alert dialog asking the user to confirm that the task is done
+  void _promptRemoveTodoItem(int index) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return new AlertDialog(
+              title: new Text('Mark "${todoTaskList[index]}" as done?'),
+              actions: <Widget>[
+                new FlatButton(
+                    child: new Text('CANCEL'),
+                    onPressed: () => Navigator.of(context).pop()),
+                new FlatButton(
+                    child: new Text('MARK AS DONE'),
+                    onPressed: () {
+                      _removeTodoItem(index);
+                      Navigator.of(context).pop();
+                    })
+              ]);
+        });
   }
 
   @override
@@ -193,37 +225,69 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 32.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Tasks',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30.0,
-                    ),
-                  ),
-                ),
-              ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ListView.builder(
-                    // Let the ListView know how many items it needs to build.
-                    itemCount: todoList.length,
-                    // Provide a builder function. This is where the magic happens.
-                    // Convert each item into a widget based on the type of item it is.
-                    itemBuilder: (context, index) {
-                      final item = todoList[index];
+                child: PageView.builder(
+                  itemCount: 2,
+                  controller: PageController(viewportFraction: 0.85),
+                  onPageChanged: (int index) => setState(() => _index = index),
+                  itemBuilder: (_, i) {
+                    String title = "ToDo Tasks";
+                    List taskList = todoTaskList;
 
-                      return ListTile(
-                        title: item.buildTask(context),
-                      );
-                    },
-                  ),
+                    if (i == 1) {
+                      title = "Completed Tasks";
+                      taskList = completedTaskList;
+                    }
+
+                    return Transform.scale(
+                      scale: i == _index ? 1 : 0.95,
+                      child: Card(
+                        color: Color(0xff333338),
+                        elevation: 6,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 32.0, left: 32.0, bottom: 16.0),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  title,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: ListView.builder(
+                                  // Let the ListView know how many items it needs to build.
+                                  itemCount: taskList.length,
+                                  // Provide a builder function. This is where the magic happens.
+                                  // Convert each item into a widget based on the type of item it is.
+                                  itemBuilder: (context, index) {
+                                    final item = taskList[index];
+
+                                    return ListTile(
+                                        title: item.buildTask(context),
+                                        onTap: () =>
+                                            _promptRemoveTodoItem(index));
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              ),
+              )
             ],
           ),
         ),
