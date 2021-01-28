@@ -61,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             elevation: 6,
             backgroundColor: Colors.transparent,
-            child: _DialogWithTextField(context),
+            child: _dialogWithTextField(context),
           );
         });
   }
@@ -194,10 +194,10 @@ class MessageItem implements ListItem {
       );
 }
 
-Widget _DialogWithTextField(BuildContext context) => Container(
-      height: 280,
+Widget _dialogWithTextField(BuildContext context) => Container(
+      height: 250,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color(0xff222228),
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
@@ -205,74 +205,61 @@ Widget _DialogWithTextField(BuildContext context) => Container(
         children: <Widget>[
           SizedBox(height: 24),
           Text(
-            "ADD DIALOG TITLE HERE".toUpperCase(),
+            "New Task",
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.black,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 17,
+              fontSize: 18,
             ),
           ),
           SizedBox(height: 10),
           Padding(
-              padding:
-                  EdgeInsets.only(top: 10, bottom: 10, right: 15, left: 15),
+              padding: EdgeInsets.all(16.0),
               child: TextFormField(
+                style: TextStyle(color: Colors.white, fontSize: 20.0),
                 maxLines: 1,
                 autofocus: false,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
-                  labelText: 'Text Form Field 1',
+                  contentPadding: EdgeInsets.only(
+                      top: 32.0, bottom: 16.0, left: 16.0, right: 16.0),
+                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18.0),
+                  labelText: 'Add your task here',
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                  ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
+                    borderRadius: BorderRadius.circular(4.0),
                   ),
                 ),
               )),
-          Container(
-            width: 150.0,
-            height: 1.0,
-            color: Colors.grey[400],
-          ),
-          Padding(
-              padding: EdgeInsets.only(top: 10, right: 15, left: 15),
-              child: TextFormField(
-                maxLines: 1,
-                autofocus: false,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  labelText: 'Text Form Field 2',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-              )),
-          SizedBox(height: 10),
+          SizedBox(height: 16),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  "Cancel",
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              SizedBox(width: 8),
               RaisedButton(
-                color: Colors.white,
-                child: Text(
-                  "Save".toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32.0),
+                ),
+                color: Color(0xff3E6AD5),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 16.0, bottom: 14.0, left: 8.0, right: 8.0),
+                  child: Text(
+                    "Save Task",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.0,
+                    ),
                   ),
                 ),
                 onPressed: () {
-                  print('Update the user info');
-                  // return Navigator.of(context).pop(true);
+                  //Add data to list
+                  Navigator.of(context).pop();
                 },
               )
             ],
