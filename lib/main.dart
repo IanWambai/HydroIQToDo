@@ -48,9 +48,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final List<ListItem> items = List<ListItem>.generate(
     30,
-    (i) => i % 6 == 0
-        ? HeadingItem("Heading $i")
-        : MessageItem("Sender $i", "Message body $i"),
+    (i) => i % 6 == 0 ? HeadingItem("Heading $i") : MessageItem("Sender $i"),
   );
 
   int _counter = 0;
@@ -95,27 +93,35 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-              Text(
-                'Tasks',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
+              Padding(
+                padding: const EdgeInsets.only(left: 32.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Tasks',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 30.0,
+                    ),
+                  ),
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  // Let the ListView know how many items it needs to build.
-                  itemCount: items.length,
-                  // Provide a builder function. This is where the magic happens.
-                  // Convert each item into a widget based on the type of item it is.
-                  itemBuilder: (context, index) {
-                    final item = items[index];
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ListView.builder(
+                    // Let the ListView know how many items it needs to build.
+                    itemCount: items.length,
+                    // Provide a builder function. This is where the magic happens.
+                    // Convert each item into a widget based on the type of item it is.
+                    itemBuilder: (context, index) {
+                      final item = items[index];
 
-                    return ListTile(
-                      title: item.buildTitle(context),
-                      subtitle: item.buildSubtitle(context),
-                    );
-                  },
+                      return ListTile(
+                        title: item.buildTask(context),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
@@ -135,10 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
 /// The base class for the different types of items the list can contain.
 abstract class ListItem {
   /// The title line to show in a list item.
-  Widget buildTitle(BuildContext context);
-
-  /// The subtitle line, if any, to show in a list item.
-  Widget buildSubtitle(BuildContext context);
+  Widget buildTask(BuildContext context);
 }
 
 /// A ListItem that contains data to display a heading.
@@ -147,12 +150,15 @@ class HeadingItem implements ListItem {
 
   HeadingItem(this.heading);
 
-  Widget buildTitle(BuildContext context) {
-    return Text(
-      heading,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 30.0,
+  Widget buildTask(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+      child: Text(
+        heading,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 20.0,
+        ),
       ),
     );
   }
@@ -162,18 +168,20 @@ class HeadingItem implements ListItem {
 
 /// A ListItem that contains data to display a message.
 class MessageItem implements ListItem {
-  final String sender;
-  final String body;
+  final String task;
 
-  MessageItem(this.sender, this.body);
+  MessageItem(this.task);
 
-  Widget buildTitle(BuildContext context) => Text(
-        sender,
-        style: TextStyle(color: Colors.white),
-      );
-
-  Widget buildSubtitle(BuildContext context) => Text(
-        body,
-        style: TextStyle(color: Colors.white),
+  Widget buildTask(BuildContext context) => Container(
+        decoration: BoxDecoration(
+            color: Color(0xff222228),
+            borderRadius: BorderRadius.all(Radius.circular(8))),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            task,
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       );
 }
