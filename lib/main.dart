@@ -123,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     return ListTile(
                                         title: item.buildTask(context),
                                         onTap: () =>
-                                            _promptRemoveTodoItem(index));
+                                            _promptRemoveTodoItem(index, i));
                                   },
                                 ),
                               ),
@@ -161,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Container(
               height: 250,
               decoration: BoxDecoration(
-                color: Color(0xff222228),
+                color: Color(colorBackgroundLight),
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
@@ -220,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32.0),
                         ),
-                        color: Color(0xff3E6AD5),
+                        color: Color(colorAccent),
                         child: Padding(
                           padding: const EdgeInsets.only(
                               top: 16.0, bottom: 14.0, left: 8.0, right: 8.0),
@@ -257,15 +257,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // This modifies the array of todo strings and notifies the app that the state has changed by using setState
-  void _removeTodoItem(int index) {
+  void _completeTodoItem(int index, int list) {
     setState(() {
-      completedTaskList.add(todoTaskList[index]);
-      todoTaskList.removeAt(index);
+      if (list == LIST_TODO) {
+        completedTaskList.add(todoTaskList[index]);
+        todoTaskList.removeAt(index);
+      }
+    });
+  }
+
+  // This modifies the array of todo strings and notifies the app that the state has changed by using setState
+  void _removeTodoItem(int index, int list) {
+    setState(() {
+      if (list == LIST_TODO) {
+        todoTaskList.removeAt(index);
+      } else {
+        todoTaskList.removeAt(index);
+      }
     });
   }
 
   // Show an alert dialog asking the user to confirm that the task is done
-  void _promptRemoveTodoItem(int index) {
+  void _promptRemoveTodoItem(int index, int list) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -273,14 +286,26 @@ class _MyHomePageState extends State<MyHomePage> {
               title: new Text('Mark "${todoTaskList[index]}" as done?'),
               actions: <Widget>[
                 new FlatButton(
+                    child: new Text('Delete'),
+                    onPressed: () {
+                      _removeTodoItem(index, list);
+                      Navigator.of(context).pop();
+                    }),
+                new FlatButton(
                     child: new Text('Cancel'),
                     onPressed: () => Navigator.of(context).pop()),
                 new FlatButton(
-                    child: new Text('Mark as Done'),
+                    child: new Text(
+                      'Mark as Done',
+                      style: TextStyle(
+                        color: Color(colorAccent),
+                        fontSize: 18.0,
+                      ),
+                    ),
                     onPressed: () {
-                      _removeTodoItem(index);
+                      _completeTodoItem(index, list);
                       Navigator.of(context).pop();
-                    })
+                    }),
               ]);
         });
   }

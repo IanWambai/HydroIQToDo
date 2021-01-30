@@ -9,6 +9,10 @@ const String appFont = "JosefinSans";
 const String tasksToDo = "Tasks ToDo";
 const String tasksCompleted = "Completed Tasks";
 
+// Integers
+const int LIST_TODO = 0;
+const int LIST_COMPLETED = 1;
+
 // Colors
 const int colorBackground = 0xff17171A;
 const int colorBackgroundLight = 0xff222228;
