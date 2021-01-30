@@ -37,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<TodoItem> todoTaskList = new List();
   final List<TodoItem> completedTaskList = new List();
   int _index = 0;
+  int editItemIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -168,15 +169,25 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 children: <Widget>[
                   SizedBox(height: 24),
-                  Text(
-                    "New Task",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
+                  editItemIndex > -1
+                      ? Text(
+                          "Edit Task",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        )
+                      : Text(
+                          "New Task",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
                   SizedBox(height: 10),
                   Padding(
                       padding: EdgeInsets.all(16.0),
@@ -228,7 +239,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         onPressed: () {
                           //Add data to list
-                          _addTodoItem();
+                          if (editItemIndex > -1) {
+                            _editTodoItem();
+                          } else {
+                            _addTodoItem();
+                          }
+
                           todoItemController.clear();
                           Navigator.of(context).pop();
                         },
@@ -253,12 +269,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // This modifies the array of todo strings and notifies the app that the state has changed by using setState
-  void _editTodoItem(int index, int list) {
+  void _showEditTodoItem(int index, int list) {
+    editItemIndex = index;
+    todoItemController.text = todoTaskList[index].taskItem;
+    _displayDialog();
+  }
+
+  // This modifies the array of todo strings and notifies the app that the state has changed by using setState
+  void _editTodoItem() {
     setState(() {
-      if (list == LIST_TODO) {
-        todoItemController.text = todoTaskList[index].taskItem;
-        _displayDialog();
-      }
+      todoTaskList[editItemIndex] = TodoItem(todoItemController.text);
+      editItemIndex = -1;
     });
   }
 
@@ -302,8 +323,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ? new FlatButton(
                         child: new Text('Edit'),
                         onPressed: () {
-                          _editTodoItem(index, list);
                           Navigator.of(context).pop();
+                          _showEditTodoItem(index, list);
                         })
                     : Container(),
                 list == LIST_TODO
