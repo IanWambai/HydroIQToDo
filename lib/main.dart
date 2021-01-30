@@ -3,7 +3,6 @@ import 'constants.dart';
 import 'task.dart';
 import 'dart:convert';
 import 'weather.dart';
-import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 
 void main() {
@@ -38,11 +37,18 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController todoItemController = TextEditingController();
 
+  // Lists
   final List<TodoItem> todoTaskList = new List();
   final List<TodoItem> completedTaskList = new List();
+
+  // Intergers
   int _index = 0;
   int editItemIndex = -1;
-  double exchangeRate;
+
+  // Weather values
+  double temperature = 0;
+  double rainfall = 0;
+  double windspeed = 0;
 
   @override
   void initState() {
@@ -50,8 +56,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     getWeatherData().then((String weatherResponse) {
       setState(() {
-        exchangeRate = double.parse(
-            jsonDecode(weatherResponse)["info"]["rate"].toString());
+        temperature = double.parse(
+            jsonDecode(weatherResponse)["current"]["temp"].toString());
+        rainfall = double.parse(
+            jsonDecode(weatherResponse)["current"]["rain"].toString());
+        windspeed = double.parse(
+            jsonDecode(weatherResponse)["current"]["wind_speed"].toString());
       });
     });
   }
@@ -80,11 +90,80 @@ class _MyHomePageState extends State<MyHomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(8))),
                     child: Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Text(
-                          'Weather information here: ' +
-                              exchangeRate.toString(),
-                          style: TextStyle(color: Colors.white),
+                        padding: const EdgeInsets.only(
+                            top: 24.0, bottom: 32.0, left: 32.0, right: 32.0),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 24.0),
+                              child: Text(
+                                'Your current weather conditions',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.0),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Column(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 8.0),
+                                      child: Text(
+                                        'Temperature',
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 12.0),
+                                      ),
+                                    ),
+                                    Text(
+                                      temperature.toString(),
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 24.0),
+                                    ),
+                                  ],
+                                ),
+                                Spacer(),
+                                Column(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 8.0),
+                                      child: Text(
+                                        'Rainfall',
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 12.0),
+                                      ),
+                                    ),
+                                    Text(
+                                      rainfall.toString(),
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 24.0),
+                                    ),
+                                  ],
+                                ),
+                                Spacer(),
+                                Column(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 8.0),
+                                      child: Text(
+                                        'Windspeed',
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 12.0),
+                                      ),
+                                    ),
+                                    Text(
+                                      windspeed.toString(),
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 24.0),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -233,7 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               top: 24.0, bottom: 16.0, left: 16.0, right: 16.0),
                           labelStyle:
                               TextStyle(color: Colors.grey, fontSize: 18.0),
-                          labelText: 'Add your task here',
+                          labelText: 'Type your task here',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),

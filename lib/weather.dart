@@ -1,12 +1,24 @@
+import 'dart:developer';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
+import 'constants.dart';
 
 Future<String> getWeatherData() async {
+  Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
+
   final response = await http.get(
-      'http://data.fixer.io/api/convert?access_key=a07f5a495053fbad8ce5a3149e77b1f8&from=USD&to=KES&amount=1');
+      'https://api.openweathermap.org/data/2.5/onecall?lat=' +
+          position.latitude.toString() +
+          '&lon=' +
+          position.longitude.toString() +
+          '&exclude=minutely,hourly,daily&units=metric&appid=' +
+          WEATHER_API_KEY);
 
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
+    log(response.body);
     return response.body;
   } else {
     // If the server did not return a 200 OK response,
