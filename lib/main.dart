@@ -1,37 +1,23 @@
 import 'package:flutter/material.dart';
+import 'constants.dart';
+import 'task.dart';
 
 void main() {
   runApp(MyApp());
 }
-
-const MaterialColor primarySwatch = MaterialColor(
-  0xff17171A,
-  <int, Color>{
-    50: Color(0xff17171A),
-    100: Color(0xff17171A),
-    200: Color(0xff17171A),
-    300: Color(0xff17171A),
-    400: Color(0xff17171A),
-    500: Color(0xff17171A),
-    600: Color(0xff17171A),
-    700: Color(0xff17171A),
-    800: Color(0xff17171A),
-    900: Color(0xff17171A),
-  },
-);
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'HydroIQ ToDo',
+      title: appName,
       theme: ThemeData(
-        fontFamily: 'JosefinSans',
+        fontFamily: appFont,
         primarySwatch: primarySwatch,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'HydroIQ ToDo'),
+      home: MyHomePage(title: appName),
     );
   }
 }
@@ -51,6 +37,116 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<ListItem> todoTaskList = new List();
   final List<ListItem> completedTaskList = new List();
   int _index = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(child: Text("Monday 28th")),
+      ),
+      body: Container(
+        color: Color(colorBackground),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Color(colorBackgroundLight),
+                        borderRadius: BorderRadius.all(Radius.circular(8))),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Text(
+                          'Weather information here',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: PageView.builder(
+                  itemCount: 2,
+                  controller: PageController(viewportFraction: 0.85),
+                  onPageChanged: (int index) => setState(() => _index = index),
+                  itemBuilder: (_, i) {
+                    String title = tasksToDo;
+                    List taskList = todoTaskList;
+
+                    if (i == 1) {
+                      title = tasksCompleted;
+                      taskList = completedTaskList;
+                    }
+
+                    return Transform.scale(
+                      scale: i == _index ? 1 : 0.95,
+                      child: Card(
+                        color: Color(colorBackgroundLight),
+                        elevation: 6,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 32.0, left: 32.0, bottom: 16.0),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  title,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: ListView.builder(
+                                  // Let the ListView know how many items it needs to build.
+                                  itemCount: taskList.length,
+                                  // Provide a builder function. This is where the magic happens.
+                                  // Convert each item into a widget based on the type of item it is.
+                                  itemBuilder: (context, index) {
+                                    final item = taskList[index];
+
+                                    return ListTile(
+                                        title: item.buildTask(context),
+                                        onTap: () =>
+                                            _promptRemoveTodoItem(index));
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Color(colorAccent),
+        onPressed: _displayDialog,
+        child: Icon(Icons.add),
+      ),
+    );
+  }
 
   _displayDialog() {
     return showDialog(
@@ -154,15 +250,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // This will be called each time the + button is pressed
   void _addTodoItem() {
-    // Putting our code inside "setState" tells the app that our state has changed, and
-    // it will automatically re-render the list
+    // Putting our code inside "setState" tells the app that our state has changed, and it will automatically re-render the list
     setState(() {
       todoTaskList.add(TodoItem(todoItemController.text));
     });
   }
 
-  // Much like _addTodoItem, this modifies the array of todo strings and
-// notifies the app that the state has changed by using setState
+  // This modifies the array of todo strings and notifies the app that the state has changed by using setState
   void _removeTodoItem(int index) {
     setState(() {
       completedTaskList.add(todoTaskList[index]);
@@ -179,10 +273,10 @@ class _MyHomePageState extends State<MyHomePage> {
               title: new Text('Mark "${todoTaskList[index]}" as done?'),
               actions: <Widget>[
                 new FlatButton(
-                    child: new Text('CANCEL'),
+                    child: new Text('Cancel'),
                     onPressed: () => Navigator.of(context).pop()),
                 new FlatButton(
-                    child: new Text('MARK AS DONE'),
+                    child: new Text('Mark as Done'),
                     onPressed: () {
                       _removeTodoItem(index);
                       Navigator.of(context).pop();
@@ -190,163 +284,4 @@ class _MyHomePageState extends State<MyHomePage> {
               ]);
         });
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text("Monday 28th")),
-      ),
-      body: Container(
-        color: Color(0xff17171A),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Color(0xff222228),
-                        borderRadius: BorderRadius.all(Radius.circular(8))),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32.0),
-                        child: Text(
-                          'Weather information here',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: PageView.builder(
-                  itemCount: 2,
-                  controller: PageController(viewportFraction: 0.85),
-                  onPageChanged: (int index) => setState(() => _index = index),
-                  itemBuilder: (_, i) {
-                    String title = "ToDo Tasks";
-                    List taskList = todoTaskList;
-
-                    if (i == 1) {
-                      title = "Completed Tasks";
-                      taskList = completedTaskList;
-                    }
-
-                    return Transform.scale(
-                      scale: i == _index ? 1 : 0.95,
-                      child: Card(
-                        color: Color(0xff333338),
-                        elevation: 6,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 32.0, left: 32.0, bottom: 16.0),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  title,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24.0,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: ListView.builder(
-                                  // Let the ListView know how many items it needs to build.
-                                  itemCount: taskList.length,
-                                  // Provide a builder function. This is where the magic happens.
-                                  // Convert each item into a widget based on the type of item it is.
-                                  itemBuilder: (context, index) {
-                                    final item = taskList[index];
-
-                                    return ListTile(
-                                        title: item.buildTask(context),
-                                        onTap: () =>
-                                            _promptRemoveTodoItem(index));
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(0xff3E6AD5),
-        onPressed: _displayDialog,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-/// The base class for the different types of items the list can contain.
-abstract class ListItem {
-  /// The title line to show in a list item.
-  Widget buildTask(BuildContext context);
-}
-
-/// A ListItem that contains data to display a heading.
-class HeadingItem implements ListItem {
-  final String heading;
-
-  HeadingItem(this.heading);
-
-  Widget buildTask(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-      child: Text(
-        heading,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20.0,
-        ),
-      ),
-    );
-  }
-
-  Widget buildSubtitle(BuildContext context) => null;
-}
-
-/// A ListItem that contains data to display a message.
-class TodoItem implements ListItem {
-  final String task;
-
-  TodoItem(this.task);
-
-  Widget buildTask(BuildContext context) => Container(
-        decoration: BoxDecoration(
-            color: Color(0xff222228),
-            borderRadius: BorderRadius.all(Radius.circular(8))),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            task,
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      );
 }
