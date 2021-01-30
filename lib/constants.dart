@@ -9,6 +9,8 @@ const String appFont = "JosefinSans";
 const String tasksToDo = "Tasks ToDo";
 const String tasksCompleted = "Completed Tasks";
 
+const String WEATHER_API_KEY = "b90b68e891874cedbe7af7c9763a9937";
+
 // Integers
 const int LIST_TODO = 0;
 const int LIST_COMPLETED = 1;

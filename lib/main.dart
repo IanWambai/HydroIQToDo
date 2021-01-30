@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'constants.dart';
 import 'task.dart';
+import 'dart:convert';
+import 'weather.dart';
+import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 
 void main() {
   runApp(MyApp());
@@ -38,12 +42,25 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<TodoItem> completedTaskList = new List();
   int _index = 0;
   int editItemIndex = -1;
+  double exchangeRate;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getWeatherData().then((String weatherResponse) {
+      setState(() {
+        exchangeRate = double.parse(
+            jsonDecode(weatherResponse)["info"]["rate"].toString());
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("Monday 28th")),
+        title: Center(child: Text(Jiffy(DateTime.now()).format("EEEE do"))),
       ),
       body: Container(
         color: Color(colorBackground),
@@ -65,7 +82,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(32.0),
                         child: Text(
-                          'Weather information here',
+                          'Weather information here: ' +
+                              exchangeRate.toString(),
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -128,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               : Expanded(
                                   child: Padding(
                                     padding:
-                                        const EdgeInsets.only(bottom: 48.0),
+                                        const EdgeInsets.only(bottom: 60.0),
                                     child: Center(
                                       child: Text(
                                         "Your tasks will appear here",
