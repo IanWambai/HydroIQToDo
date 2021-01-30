@@ -20,7 +20,7 @@ class TodoItem implements ListItem {
 
   Widget buildTask(BuildContext context) => Container(
         decoration: BoxDecoration(
-            color: Color(colorBackground),
+            color: Color(colorBackgroundLight),
             borderRadius: BorderRadius.all(Radius.circular(8))),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

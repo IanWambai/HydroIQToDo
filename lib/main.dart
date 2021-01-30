@@ -89,48 +89,59 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     return Transform.scale(
                       scale: i == _index ? 1 : 0.95,
-                      child: Card(
-                        color: Color(colorBackgroundLight),
-                        elevation: 6,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 32.0, left: 32.0, bottom: 16.0),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  title,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24.0,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 16.0, left: 16.0, bottom: 16.0),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                title,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                          taskList.length > 0
+                              ? Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: ListView.builder(
+                                      // Let the ListView know how many items it needs to build.
+                                      itemCount: taskList.length,
+                                      // Provide a builder function. This is where the magic happens.
+                                      // Convert each item into a widget based on the type of item it is.
+                                      itemBuilder: (context, index) {
+                                        final item = taskList[index];
+
+                                        return ListTile(
+                                            title: item.buildTask(context),
+                                            onTap: () => _promptRemoveTodoItem(
+                                                index, i));
+                                      },
+                                    ),
+                                  ),
+                                )
+                              : Expanded(
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 48.0),
+                                    child: Center(
+                                      child: Text(
+                                        "Your tasks will appear here",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: ListView.builder(
-                                  // Let the ListView know how many items it needs to build.
-                                  itemCount: taskList.length,
-                                  // Provide a builder function. This is where the magic happens.
-                                  // Convert each item into a widget based on the type of item it is.
-                                  itemBuilder: (context, index) {
-                                    final item = taskList[index];
-
-                                    return ListTile(
-                                        title: item.buildTask(context),
-                                        onTap: () =>
-                                            _promptRemoveTodoItem(index, i));
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     );
                   },
@@ -208,11 +219,19 @@ class _MyHomePageState extends State<MyHomePage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color(colorAccent), width: 2.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color(colorBackground), width: 0.0),
+                          ),
                         ),
                         // The validator receives the text that the user has entered.
                         validator: (value) {
                           if (value.isEmpty) {
-                            return 'Add your task here';
+                            return 'Type your task here';
                           }
                           return null;
                         },
@@ -310,39 +329,135 @@ class _MyHomePageState extends State<MyHomePage> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return new AlertDialog(
-              title:
-                  new Text('Mark "${todoTaskList[index].taskItem}" as done?'),
-              actions: <Widget>[
-                new FlatButton(
-                    child: new Text('Delete'),
-                    onPressed: () {
-                      _removeTodoItem(index, list);
-                      Navigator.of(context).pop();
-                    }),
-                list == LIST_TODO
-                    ? new FlatButton(
-                        child: new Text('Edit'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _showEditTodoItem(index, list);
-                        })
-                    : Container(),
-                list == LIST_TODO
-                    ? new FlatButton(
-                        child: new Text(
-                          'Mark as Done',
-                          style: TextStyle(
-                            color: Color(colorAccent),
-                            fontSize: 18.0,
+          return new Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(36),
+            ),
+            elevation: 6,
+            backgroundColor: Colors.transparent,
+            child: Container(
+              height: 300,
+              decoration: BoxDecoration(
+                color: Color(colorBackgroundLight),
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 32.0, bottom: 32.0, left: 16.0, right: 16.0),
+                    child: list == LIST_TODO
+                        ? new Text(
+                            todoTaskList[index].taskItem,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                            ),
+                          )
+                        : new Text(
+                            completedTaskList[index].taskItem,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                  ),
+                  list == LIST_TODO
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: ButtonTheme(
+                            minWidth: 180.0,
+                            child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32.0),
+                              ),
+                              color: Color(colorAccent),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 16.0,
+                                    bottom: 14.0,
+                                    left: 8.0,
+                                    right: 8.0),
+                                child: Text(
+                                  "Mark as Done",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18.0,
+                                  ),
+                                ),
+                              ),
+                              onPressed: () {
+                                _completeTodoItem(index, list);
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ),
+                        )
+                      : Container(height: 20),
+                  list == LIST_TODO
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: ButtonTheme(
+                            minWidth: 180.0,
+                            child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32.0),
+                              ),
+                              color: Color(colorAccent),
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 16.0,
+                                    bottom: 14.0,
+                                    left: 8.0,
+                                    right: 8.0),
+                                child: Text(
+                                  "Edit",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18.0,
+                                  ),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                _showEditTodoItem(index, list);
+                              },
+                            ),
+                          ),
+                        )
+                      : Container(height: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: ButtonTheme(
+                      minWidth: 180.0,
+                      child: RaisedButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32.0),
+                        ),
+                        color: Colors.redAccent,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 16.0, bottom: 14.0, left: 8.0, right: 8.0),
+                          child: Text(
+                            "Delete",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                            ),
                           ),
                         ),
                         onPressed: () {
-                          _completeTodoItem(index, list);
+                          _removeTodoItem(index, list);
                           Navigator.of(context).pop();
-                        })
-                    : Container(),
-              ]);
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         });
   }
 }
