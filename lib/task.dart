@@ -7,33 +7,13 @@ abstract class ListItem {
   Widget buildTask(BuildContext context);
 }
 
-// A ListItem that contains data to display a heading.
-class HeadingItem implements ListItem {
-  final String heading;
-
-  HeadingItem(this.heading);
-
-  Widget buildTask(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-      child: Text(
-        heading,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20.0,
-        ),
-      ),
-    );
-  }
-
-  Widget buildSubtitle(BuildContext context) => null;
-}
-
 // A ListItem that contains data to display a message.
 class TodoItem implements ListItem {
   final String task;
 
   TodoItem(this.task);
+
+  String get taskItem => task;
 
   Widget buildTask(BuildContext context) => Container(
         decoration: BoxDecoration(

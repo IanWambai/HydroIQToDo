@@ -34,8 +34,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController todoItemController = TextEditingController();
 
-  final List<ListItem> todoTaskList = new List();
-  final List<ListItem> completedTaskList = new List();
+  final List<TodoItem> todoTaskList = new List();
+  final List<TodoItem> completedTaskList = new List();
   int _index = 0;
 
   @override
@@ -187,19 +187,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         autofocus: false,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
+                          fillColor: Color(colorBackground),
+                          filled: true,
                           contentPadding: EdgeInsets.only(
                               top: 24.0, bottom: 16.0, left: 16.0, right: 16.0),
                           labelStyle:
                               TextStyle(color: Colors.grey, fontSize: 18.0),
                           labelText: 'Add your task here',
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.grey, width: 1.0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.grey, width: 1.0),
-                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
@@ -252,7 +246,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void _addTodoItem() {
     // Putting our code inside "setState" tells the app that our state has changed, and it will automatically re-render the list
     setState(() {
-      todoTaskList.add(TodoItem(todoItemController.text));
+      if (todoItemController.text.isNotEmpty) {
+        todoTaskList.add(TodoItem(todoItemController.text));
+      }
+    });
+  }
+
+  // This modifies the array of todo strings and notifies the app that the state has changed by using setState
+  void _editTodoItem(int index, int list) {
+    setState(() {
+      if (list == LIST_TODO) {
+        todoItemController.text = todoTaskList[index].taskItem;
+        _displayDialog();
+      }
     });
   }
 
@@ -272,7 +278,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (list == LIST_TODO) {
         todoTaskList.removeAt(index);
       } else {
-        todoTaskList.removeAt(index);
+        completedTaskList.removeAt(index);
       }
     });
   }
@@ -283,7 +289,8 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context,
         builder: (BuildContext context) {
           return new AlertDialog(
-              title: new Text('Mark "${todoTaskList[index]}" as done?'),
+              title:
+                  new Text('Mark "${todoTaskList[index].taskItem}" as done?'),
               actions: <Widget>[
                 new FlatButton(
                     child: new Text('Delete'),
@@ -291,21 +298,28 @@ class _MyHomePageState extends State<MyHomePage> {
                       _removeTodoItem(index, list);
                       Navigator.of(context).pop();
                     }),
-                new FlatButton(
-                    child: new Text('Cancel'),
-                    onPressed: () => Navigator.of(context).pop()),
-                new FlatButton(
-                    child: new Text(
-                      'Mark as Done',
-                      style: TextStyle(
-                        color: Color(colorAccent),
-                        fontSize: 18.0,
-                      ),
-                    ),
-                    onPressed: () {
-                      _completeTodoItem(index, list);
-                      Navigator.of(context).pop();
-                    }),
+                list == LIST_TODO
+                    ? new FlatButton(
+                        child: new Text('Edit'),
+                        onPressed: () {
+                          _editTodoItem(index, list);
+                          Navigator.of(context).pop();
+                        })
+                    : Container(),
+                list == LIST_TODO
+                    ? new FlatButton(
+                        child: new Text(
+                          'Mark as Done',
+                          style: TextStyle(
+                            color: Color(colorAccent),
+                            fontSize: 18.0,
+                          ),
+                        ),
+                        onPressed: () {
+                          _completeTodoItem(index, list);
+                          Navigator.of(context).pop();
+                        })
+                    : Container(),
               ]);
         });
   }
