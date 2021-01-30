@@ -263,7 +263,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // Putting our code inside "setState" tells the app that our state has changed, and it will automatically re-render the list
     setState(() {
       if (todoItemController.text.isNotEmpty) {
-        todoTaskList.add(TodoItem(todoItemController.text));
+        todoTaskList.add(TodoItem(todoItemController.text, DateTime.now()));
       }
     });
   }
@@ -278,7 +278,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // This modifies the array of todo strings and notifies the app that the state has changed by using setState
   void _editTodoItem() {
     setState(() {
-      todoTaskList[editItemIndex] = TodoItem(todoItemController.text);
+      todoTaskList[editItemIndex] =
+          TodoItem(todoItemController.text, DateTime.now());
       editItemIndex = -1;
     });
   }
