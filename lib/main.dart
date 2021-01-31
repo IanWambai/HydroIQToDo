@@ -53,6 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
   double rainfall = 0;
   double windspeed = 0;
 
+  SharedPreferences prefs;
+
   @override
   void initState() {
     super.initState();
@@ -435,45 +437,44 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _getStoredLists() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var storedToDo = prefs.getStringList('todo') ?? [];
-    for (String todo in storedToDo) {
-      todoTaskList.add(new TodoItem(todo.split("//")[0], DateTime.now()));
-    }
+    SharedPreferences.getInstance().then((SharedPreferences sp) {
+      prefs = sp;
 
-    var storedCompleted = prefs.getStringList('completed') ?? [];
-    for (String completed in storedCompleted) {
-      completedTaskList
-          .add(new TodoItem(completed.split("//")[0], DateTime.now()));
-    }
+      var storedToDo = prefs.getStringList('todo') ?? [];
+      for (String todo in storedToDo) {
+        todoTaskList.add(new TodoItem(todo.split("//")[0], DateTime.now()));
+      }
 
-    log("YAYA1: " + storedToDo.toString());
-    log("YAYA1: " + storedCompleted.toString());
+      var storedCompleted = prefs.getStringList('completed') ?? [];
+      for (String completed in storedCompleted) {
+        completedTaskList
+            .add(new TodoItem(completed.split("//")[0], DateTime.now()));
+      }
+
+      setState(() {});
+    });
   }
 
   Future<void> _updateLists() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     var storedToDo = [];
-
-    for (var todoItem in todoTaskList) {
-      storedToDo.add(todoItem.task +
-          "//" +
-          todoItem.time.millisecondsSinceEpoch.toString());
-    }
-
     var storedCompleted = [];
 
-    for (var todoItem in completedTaskList) {
-      storedCompleted.add(todoItem.task +
-          "//" +
-          todoItem.time.millisecondsSinceEpoch.toString());
-    }
+    setState(() {
+      for (var todoItem in todoTaskList) {
+        storedToDo.add(todoItem.task +
+            "//" +
+            todoItem.time.millisecondsSinceEpoch.toString());
+      }
 
-    log("YAYA2: " + storedToDo.toString());
-    log("YAYA2: " + storedCompleted.toString());
+      for (var todoItem in completedTaskList) {
+        storedCompleted.add(todoItem.task +
+            "//" +
+            todoItem.time.millisecondsSinceEpoch.toString());
+      }
+    });
 
-    await prefs.setStringList('todo', storedToDo);
-    await prefs.setStringList('completed', storedCompleted);
+    prefs?.setStringList('todo', storedToDo);
+    prefs?.setStringList('completed', storedCompleted);
   }
 
   // Show an alert dialog asking the user to confirm that the task is done
