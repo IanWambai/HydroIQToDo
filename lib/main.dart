@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'constants.dart';
 import 'task.dart';
 import 'dart:convert';
 import 'weather.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -53,6 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+
+    _getStoredLists();
 
     getWeatherData().then((String weatherResponse) {
       setState(() {
@@ -381,6 +386,8 @@ class _MyHomePageState extends State<MyHomePage> {
       if (todoItemController.text.isNotEmpty) {
         todoTaskList.add(TodoItem(todoItemController.text, DateTime.now()));
       }
+
+      _updateLists();
     });
   }
 
@@ -397,6 +404,8 @@ class _MyHomePageState extends State<MyHomePage> {
       todoTaskList[editItemIndex] =
           TodoItem(todoItemController.text, DateTime.now());
       editItemIndex = -1;
+
+      _updateLists();
     });
   }
 
@@ -407,6 +416,8 @@ class _MyHomePageState extends State<MyHomePage> {
         completedTaskList.add(todoTaskList[index]);
         todoTaskList.removeAt(index);
       }
+
+      _updateLists();
     });
   }
 
@@ -418,7 +429,51 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         completedTaskList.removeAt(index);
       }
+
+      _updateLists();
     });
+  }
+
+  Future<void> _getStoredLists() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var storedToDo = prefs.getStringList('todo') ?? [];
+    for (String todo in storedToDo) {
+      todoTaskList.add(new TodoItem(todo.split("//")[0], DateTime.now()));
+    }
+
+    var storedCompleted = prefs.getStringList('completed') ?? [];
+    for (String completed in storedCompleted) {
+      completedTaskList
+          .add(new TodoItem(completed.split("//")[0], DateTime.now()));
+    }
+
+    log("YAYA1: " + storedToDo.toString());
+    log("YAYA1: " + storedCompleted.toString());
+  }
+
+  Future<void> _updateLists() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var storedToDo = [];
+
+    for (var todoItem in todoTaskList) {
+      storedToDo.add(todoItem.task +
+          "//" +
+          todoItem.time.millisecondsSinceEpoch.toString());
+    }
+
+    var storedCompleted = [];
+
+    for (var todoItem in completedTaskList) {
+      storedCompleted.add(todoItem.task +
+          "//" +
+          todoItem.time.millisecondsSinceEpoch.toString());
+    }
+
+    log("YAYA2: " + storedToDo.toString());
+    log("YAYA2: " + storedCompleted.toString());
+
+    await prefs.setStringList('todo', storedToDo);
+    await prefs.setStringList('completed', storedCompleted);
   }
 
   // Show an alert dialog asking the user to confirm that the task is done
